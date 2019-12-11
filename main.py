@@ -31,7 +31,7 @@ while True:
         axle = input(messageAxle)
         log('bot',messageAxle)
         log('user',axle)
-        while (re.match('^[468]x[24]$',axle) or re.match('^10x[24]$',axle)) is None:
+        while (re.match('^[2-9]x[24]$',axle) or re.match('^10x[24]$',axle)) is None:
             messageNxN = 'Please enter the correct axle configuration. '
             axle = input(messageNxN)
             log('bot',messageNxN)
