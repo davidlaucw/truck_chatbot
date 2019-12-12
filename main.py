@@ -57,7 +57,7 @@ while True:
                 fleet.append(truck)
                 
         msg('Thank you, {}! {}\'s fleet of trucks is listed below:'.format(name, companyName))
-        msg('(brand, model name, engine size, axle number, weight, max load, numbers)')
+        msg('(brand, model name, engine size, num of axle, weight, max load, num of trucks)')
         msg(fleet)
         break
 
