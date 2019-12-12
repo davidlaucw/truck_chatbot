@@ -1,81 +1,100 @@
 #import numpy as np
-import pandas as pd
 import csv
 from datetime import datetime as dt
-import re
+import sys
+import pandas as pd
+#import re
 
 logs = []
-fleet=[]
-def log(side,message):
-    logs.append([dt.now().strftime('%Y-%m-%d %H:%M:%S'),side,message])
-def start():
-    message = "Hello. I am your truck chatbox."
-    print(message)
-    log('bot',message)
-def isNumber(s):
-    try:
-        float(s)
-        return float(s)
-    except:
-        return None
+fleet = []
+def log(side, message):
+    logs.append([dt.now().strftime('%Y-%m-%d %H:%M:%S'), side, message])
 
-start()
-i = 0
-while True:
-    messageNewTruck = 'Do you want to add the truck {} in your fleet(y/n)? '.format(i+1)
-    newTruck = input(messageNewTruck)
-    log('bot',messageNewTruck)
-    log('user',newTruck)
-    if newTruck == 'y':
-        messageAxle = 'What is the axle configuration (nxn)? '
-        axle = input(messageAxle)
-        log('bot',messageAxle)
-        log('user',axle)
-        while (re.match('^[2-9]x[24]$',axle) or re.match('^10x[24]$',axle)) is None:
-            messageNxN = 'Please enter the correct axle configuration. '
-            axle = input(messageNxN)
-            log('bot',messageNxN)
-            log('user',axle)
-            
-        messageWeight = 'What is the net weight of the truck in kg? '
-        weight = input(messageWeight)
-        log('bot',messageWeight)
-        log('user',weight)
-        weight = isNumber(weight)
-        while weight is None:
-            messageNumberWeight = 'Please enter a number for the weight in kg. '
-            weight = input(messageNumberWeight)
-            log('bot',messageNumberWeight)
-            log('user',weight)
-            weight = isNumber(weight)
-        
-        messageLoad = 'What is the load of the truck in kg? '
-        load = input(messageLoad)
-        log('bot',messageLoad)
-        log('user',load)
-        load = isNumber(load)
-        while load is None:
-            messageNumberLoad = 'Please enter a number for the load in kg. '
-            weight = input(messageNumberLoad)
-            log('bot',messageNumberLoad)
-            log('user',load)
-            load = isNumber(load)    
-        fleet.append([i+1,axle,weight,load])
-        i+=1
-    elif newTruck == 'n':
-        break
+def qna(message, num=False, isInt=False):
+    value = input(message)
+    log('bot', message)
+    log('user', value)
+    if num is False:
+        return value
     else:
-        messageyorn = 'Please enter y or n. '
-        print(messageyorn)
-        log('bot',messageyorn)
-        
-messageEND = 'Your fleet of trucks is listed below (number,axle configuration,weight,load):'
-print(messageEND)
-log('bot',messageEND)
-print(fleet)
-log('bot',fleet)
+        return isNumberMsg(value, isInt=isInt)
 
-#print(logs)
+def msg(message):
+    print(message)
+    log('bot', message)
+    
+def isNumberMsg(value, isInt=False):
+    try:
+        float(value)
+        if isInt:
+            if int(value)-float(value) == 0 and int(value) > 0:
+                return int(value)
+            else:
+                return qna('Please enter an integer > 0: ', num=True, isInt=isInt)
+        else:
+            return float(value)
+    except ValueError:
+        return qna('Please enter a number: ', num=True, isInt=isInt)
 
-df = pd.DataFrame(logs, columns= ['time','side', 'message'])
-df.to_csv(dt.now().strftime('%Y%m%d%H%M%S')+'.csv',index=False,quoting=csv.QUOTE_NONNUMERIC)
+name = qna("Hello. What is your name? ")
+companyName = qna("Hi {}, what is the name of your company? ".format(name))
+while True:
+    haveTruck = qna('Do you own trucks (y/n)? ')
+    if haveTruck.lower() == 'y':
+        #numTruck = qna('How many trucks do you have? ',num=True,isInt=True)
+        brands = qna('What brands are they? (Please separate them with comma without spaces.) ')
+        brands = brands.split(",")
+        for brand in brands:
+            #trucksInSameBrand = qna('How many {} trucks do you have? '.format(brand),num=True,isInt=True)
+            numModels = qna('How many {} models are there? '.format(brand), num=True, isInt=True)
+            model = []
+            for i in range(numModels):
+                model.append(qna('What is the model {}? '.format(i+1)))
+                model.append(qna('What is the engine size in liter? ', num=True))
+                model.append(qna('How many axles do each of them have? ', num=True, isInt=True))
+                model.append(qna('What is the weight of each of them in kg? ', num=True))
+                model.append(qna('What is the maximum load of each of them in kg? ', num=True))
+                model.append(qna('How many such trucks do you have? ', num=True, isInt=True))
+                fleet.append([brand, model])
+        break
+
+    elif haveTruck.lower() == 'n':
+        msg('Thank you, {}. Good bye.'.format(name))
+        df = pd.DataFrame(logs, columns=['time', 'side', 'message'])
+        df.to_csv(dt.now().strftime('%Y%m%d%H%M%S')+'.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
+        sys.exit()
+
+    else:
+        msg('Please enter "y" or "n" only.')
+
+msg('Thank you, {}! {}\'s fleet of trucks is listed below (brand,[model name, engine size, axle number, weight, max load, numbers]):'.format(name, companyName))
+msg(fleet)
+
+df = pd.DataFrame(logs, columns=['time', 'side', 'message'])
+df.to_csv(dt.now().strftime('%Y%m%d%H%M%S')+'.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)
+
+
+# def isNumber(s):
+#     try:
+#         float(s)
+#         return float(s)
+#     except:
+#         return None
+
+# def isNumberMsg(value, isInt=False):
+#     if isInt:
+#         try:
+#             int(value)
+#             if value > 0:
+#                 return int(value)
+#             else:
+#                 return int(qna('Please enter an integer > 0: ', num=True, isInt=isInt))
+#         except:
+#             print(value,type(value))
+#             return int(qna('Please enter an integer > 0 (NaN): ', num=True, isInt=isInt))
+#     else:
+#         try:
+#             float(value)
+#             return float(value)
+#         except:
+#             return float(qna('Please enter a number. ', num=True))
