@@ -25,15 +25,16 @@ def msg(message):
     
 def isNumberMsg(value, isInt=False):
     try:
-        if isInt:
-            if int(value)-float(value) == 0 and int(value) > 0:
-                return int(value)
-            else:
-                return qna('Please enter an integer > 0: ', num=True, isInt=isInt)
-        else:
-            return float(value)
+        value = float(value)
     except ValueError:
         return qna('Please enter a number: ', num=True, isInt=isInt)
+    if isInt:
+        if int(value)-value == 0 and int(value) > 0:
+            return int(value)
+        else:
+            return qna('Please enter an integer > 0: ', num=True, isInt=isInt)
+    else:
+        return value
 
 name = qna("Hello. What is your name? ")
 companyName = qna("Hi {}, what is the name of your company? ".format(name))
@@ -45,7 +46,7 @@ while True:
         brands = brands.split(",")
         for brand in brands:
             #trucksInSameBrand = qna('How many {} trucks do you have? '.format(brand),num=True,isInt=True)
-            numModels = qna('How many {} models are there? '.format(brand), num=True, isInt=True)
+            numModels = qna('How many {}\'s models are there? '.format(brand), num=True, isInt=True)
             model = []
             for i in range(numModels):
                 model.append(qna('What is the model {}? '.format(i+1)))
