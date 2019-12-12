@@ -25,7 +25,6 @@ def msg(message):
     
 def isNumberMsg(value, isInt=False):
     try:
-        float(value)
         if isInt:
             if int(value)-float(value) == 0 and int(value) > 0:
                 return int(value)
