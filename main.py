@@ -70,15 +70,20 @@ def spellchecking(word):
     if len(spell.unknown([word])) == 0:
         return word
     else:
-        return qna('For {}, do you mean {}? Please retype: '.format(word,spell.candidates(word)))
+        word = qna('For {}, do you mean {}? Please retype only the brand name: '.format(word,spell.candidates(word)))
+        word = [x.strip() for x in word.split(',')]
+        if len(word) == 2:
+            return word[1]
+        else:
+            return word
 
 name = qna("Hello. What is your name? ")
 companyName = qna("Hi {}, what is the name of your company? ".format(name))
 while True:
     haveTruck = qna('Do you own trucks (y/n)? ')
     if haveTruck.lower() == 'y':
-        brands = qna('What brands are they? (Please separate them with commas without spaces in between.) ')
-        brands = brands.split(",")
+        brands = qna('What brands are they? (Please separate them with commas.) ')
+        brands = [x.strip() for x in brands.split(',')]
         for brand in brands:
             brand =  spellchecking(brand)
             numModels = qna('How many {}\'s models are there? '.format(brand), num=True, isInt=True)
